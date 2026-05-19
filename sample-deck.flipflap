@@ -1,0 +1,17 @@
+{
+  "v": 2,
+  "app": "flipflap",
+  "exportedAt": "2026-05-19T12:00:00.000Z",
+  "name": "Solar System",
+  "icon": "planet",
+  "cards": [
+    { "front": { "text": "Mercury" }, "back": { "text": "Closest planet to the Sun — no atmosphere, extreme temperature swings" } },
+    { "front": { "text": "Venus" }, "back": { "text": "Hottest planet (~465 °C) — thick CO₂ atmosphere, retrograde rotation" } },
+    { "front": { "text": "Earth" }, "back": { "text": "Only planet known to support life — 71% surface covered in water" } },
+    { "front": { "text": "Mars" }, "back": { "text": "The Red Planet — home to Olympus Mons, the tallest volcano in the solar system" } },
+    { "front": { "text": "Jupiter" }, "back": { "text": "Largest planet — gas giant with the Great Red Spot storm & 95 known moons" } },
+    { "front": { "text": "Saturn" }, "back": { "text": "Ringed gas giant — its rings are made of ice and rock, least dense planet" } },
+    { "front": { "text": "Uranus" }, "back": { "text": "Ice giant — rotates on its side (97.77° axial tilt), faintest to the naked eye" } },
+    { "front": { "text": "Neptune" }, "back": { "text": "Furthest planet — strongest winds in the solar system (up to 2,100 km/h)" } }
+  ]
+}

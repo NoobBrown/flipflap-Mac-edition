@@ -1,0 +1,230 @@
+<script lang="ts">
+  import { appData } from '../stores/appStore';
+  import type { Folder } from '../types';
+  import { ICON_GROUPS } from '../icons';
+
+  export let onClose: () => void;
+
+  let folderName = '';
+  let selectedIcon = 'folder';
+  let iconSearch = '';
+  const MAX_NAME = 60;
+
+  $: filteredGroups = iconSearch.trim()
+    ? [{ label: 'Results', icons: ICON_GROUPS.flatMap(g => g.icons).filter(i => i.includes(iconSearch.trim().toLowerCase())) }]
+    : ICON_GROUPS;
+
+  function createFolder() {
+    if (!folderName.trim()) return;
+    const newFolder: Folder = {
+      id: crypto.randomUUID(),
+      name: folderName.trim().slice(0, MAX_NAME),
+      icon: selectedIcon,
+      createdAt: new Date().toISOString(),
+    };
+    appData.update((data) => ({ ...data, folders: [...data.folders, newFolder] }));
+    onClose();
+  }
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === 'Escape') onClose();
+  }
+</script>
+
+<svelte:window on:keydown={handleKeydown} />
+
+<div class="overlay" on:click={onClose} role="presentation">
+  <div class="modal" on:click|stopPropagation role="dialog" aria-modal="true">
+    <h2>New folder</h2>
+
+    <div class="field">
+      <div class="name-row">
+        <input
+          class="text-input"
+          type="text"
+          placeholder="Folder name"
+          bind:value={folderName}
+          maxlength={MAX_NAME}
+          autofocus
+        />
+        <span class="char-count" class:warn={folderName.length > MAX_NAME - 10}>
+          {folderName.length}/{MAX_NAME}
+        </span>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="icon-picker-header">
+        <span class="field-label">Icon</span>
+        <input
+          class="icon-search"
+          type="text"
+          placeholder="Search icons…"
+          bind:value={iconSearch}
+        />
+      </div>
+
+      <div class="icon-scroll">
+        {#each filteredGroups as group}
+          {#if group.icons.length > 0}
+            <p class="group-label">{group.label}</p>
+            <div class="icon-grid">
+              {#each group.icons as icon}
+                <button
+                  class="icon-btn"
+                  class:selected={selectedIcon === icon}
+                  title={icon}
+                  on:click={() => selectedIcon = icon}
+                >
+                  <i class="ti ti-{icon}"></i>
+                </button>
+              {/each}
+            </div>
+          {/if}
+        {/each}
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-ghost" on:click={onClose}>Cancel</button>
+      <button class="btn-primary" on:click={createFolder} disabled={!folderName.trim()}>
+        Create folder
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    animation: fadeIn 0.15s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: var(--bg-primary);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    width: 100%;
+    max-width: 460px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: hidden;
+    animation: slideUp 0.2s ease;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(8px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  h2 { font-size: 17px; font-weight: 600; color: var(--text-primary); }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+
+  .name-row { display: flex; align-items: center; gap: 8px; }
+
+  .text-input {
+    flex: 1;
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--text-primary);
+    font-family: var(--font);
+    outline: none;
+    transition: border-color 0.15s;
+    min-width: 0;
+  }
+
+  .text-input:focus { border-color: var(--accent); }
+
+  .char-count { font-size: 11px; color: var(--text-tertiary); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .char-count.warn { color: #e55; }
+
+  .field-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); }
+
+  .icon-picker-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+  .icon-search {
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 5px 10px;
+    font-size: 12px;
+    color: var(--text-primary);
+    font-family: var(--font);
+    outline: none;
+    transition: border-color 0.15s;
+    width: 160px;
+  }
+
+  .icon-search:focus { border-color: var(--accent); }
+
+  .icon-scroll {
+    overflow-y: auto;
+    max-height: 260px;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-tertiary); margin-bottom: 2px; }
+
+  .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 4px; }
+
+  .icon-btn {
+    aspect-ratio: 1;
+    background: var(--bg-secondary);
+    border: 1.5px solid transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--text-secondary);
+    transition: border-color 0.12s, color 0.12s, background 0.12s, transform 0.1s;
+  }
+
+  .icon-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+  .icon-btn:active { transform: scale(0.9); }
+  .icon-btn.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 9px 18px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary:not(:disabled):active { transform: scale(0.95); }
+
+  .btn-ghost {
+    background: var(--bg-secondary);
+    border: 0.5px solid var(--border);
+    padding: 9px 18px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text-primary);
+  }
+</style>

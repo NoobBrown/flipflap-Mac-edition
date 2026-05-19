@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\dendi\\\\Documents\\\\💻 Dev\\\\🌐 Web\\\\● Active\\\\Fledged Websites\\\\flipflap\" -Recurse -Depth 2)",
+      "Bash(Select-Object FullName)",
+      "Bash(mkdir \"C:\\\\Users\\\\dendi\\\\Documents\\\\💻 Dev\\\\🌐 Web\\\\● Active\\\\Fledged Websites\\\\flipflap\\\\src\\\\routes\\\\deck\\\\[id]\")"
+    ]
+  }
+}
